@@ -9,6 +9,15 @@ import cv2
 import os
 import RPi.GPIO as GPIO
 
+"""-----------------------------------------------------------------------------------
+Préconditions  -- robot : la variable du robot
+                  Le robot affiche des couleurs
+Postconditions -- Le robot n'affiche plus de couleurs
+-----------------------------------------------------------------------------------"""
+def ledOFF(robot) :
+    robot.set_leds(0,0,0)
+
+
 
 """-----------------------------------------------------------------------------------
 Préconditions  -- diametre : type entier ; valeur du diametre de la balle en pixels
@@ -169,6 +178,9 @@ camera = cv2.VideoCapture(0)
 
 
 while True:
+
+    BALLE = False
+
     (grabbed, frame) = camera.read()
 
     frame = imutils.resize(frame, width=600)
@@ -192,6 +204,7 @@ while True:
             print("Radius  = "+str(radius))
             pos = (300-int(x))*-1    # position par rapport au centre de l'image x=300
             print("Pos = "+str(pos))
+            BALLE = True
 
         else:
             u=os.system('clear')
@@ -199,33 +212,38 @@ while True:
             radius = -1
             x = -1
             y = -1
+            BALLE = False
     else:
         u=os.system('clear')
         print("PAS DE BALLE")
         radius = -1
         x = -1
         y = -1
+        BALLE = False
 
     cv2.imshow("Frame", frame)
     #cv2.imshow("Mask", mask)
 
-    if # A METTRE ICI
-        if x < 250 and x !=-1:
+    if BALLE == True :
+        if (x < 250) and (x !=-1) :
             #gauche
             #tournerg(holo, 1)
             holo.turn(5)
             holo.move_toward(30, 300)
 
-        elif x > 350:
+        elif (x > 350) :
             #droite
             #tournerd(holo,1)
             holo.turn(-5)
             holo.move_toward(30, 300)
 
-        elif x ==-1:
+        elif (x ==-1) :
             holo.stop_all()
-        else:
+        else :
             holo.move_toward(30, 300)
+
+    else : holo.stop_all()
+        holo.turn(20)
 
     key = cv2.waitKey(1) & 0xFF
 camera.release()
