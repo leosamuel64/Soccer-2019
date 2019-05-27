@@ -66,7 +66,8 @@ for i in range(len(elements)) :
 	x,y = elements[i]
 	pix = image[y, x] #output en B G R
 	print(pix)
-	if pix == () #AJOUTER LE TRESHOLD ORANGE DE LA balle
+	if (pix[0] >= 240) and (pix[1] >=120) and (pix[2] >= 70) :  #AJOUTER LE TRESHOLD ORANGE DE LA balle
 		BALLE = True
 		xballe = image[x]
 		yballe = image[y]
+		print("COEUR SUR VOUS")
