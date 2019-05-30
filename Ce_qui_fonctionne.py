@@ -166,8 +166,6 @@ def tourner(vitesse, angleCible) :
         correction = 10
     elif angleCible < 270 :
         correction = 6
-    elif angleCible < 270 :
-        correction = 6
     elif angleCible < 360 :
         correction = 10
     if angleCible == 180:

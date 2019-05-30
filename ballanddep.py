@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -   *-
+
+""" Partie INDISPENSABLE"""
+
 import math
 import time
 import sys
@@ -8,6 +12,28 @@ import imutils
 import cv2
 import os
 import RPi.GPIO as GPIO
+import matplotlib as plt
+
+# Indispensable au demmarage.
+GPIO.setwarnings(False)
+holo = Holobot(sys.argv[1], 115200)
+if len(sys.argv) != 2:
+    print ("error: I need the serial port (bluetooth or wired)")
+    sys.exit(0)
+
+# Set up obligatoire des pins GPIO
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(3, GPIO.OUT)
+GPIO.setup(3, GPIO.OUT, initial=GPIO.HIGH)
+GPIO.setup(26, GPIO.IN)
+
+# Calibrage du gyroscope
+print("Calibrage en cours...")
+holo.calibrate_magneto()
+time.sleep(5)
+print("Calibrage terminé")
+
+
 
 """-----------------------------------------------------------------------------------
 Préconditions  -- robot : la variable du robot
@@ -47,58 +73,8 @@ def calcAngle(xBalle):
 Préconditions  -- robot : la variable du robot
 Postconditions -- initialise le robot
 -----------------------------------------------------------------------------------"""
-def initHolo(robot):
+def init(robot):
     robot.reset_yaw()
-
-
-
-"""-----------------------------------------------------------------------------------
-Préconditions  -- robot : la variable du robot
-                  angle : type entier ; l'angle voulu en degrés
-Postconditions -- déplace le robot vers la droite
------------------------------------------------------------------------------------"""
-def tournerd(robot, angle):
-    #Constantes :
-    dt = 0.1
-    vitesse = 50
-    t = 0.0
-
-    #Calculs :
-    angle = (angle*40)/180
-    temps = angle/vitesse
-
-
-
-    #Tourner :
-    while(t < temps):
-        robot.turn(-vitesse)
-        time.sleep(dt)
-        t += dt
-    robot.stop_all()
-
-"""-----------------------------------------------------------------------------------
-Préconditions  -- robot : la variable du robot
-                  angle : type entier ; l'angle voulu en degrés
-Postconditions -- déplace le robot vers la gauche
------------------------------------------------------------------------------------"""
-def tournerg(robot, angle):
-    #Constantes :
-    dt = 0.1
-    vitesse = 50
-    t = 0.0
-
-    #Calculs :
-    angle = (angle*40)/180
-    temps = angle/vitesse
-
-
-
-    #Tourner :
-    while(t < temps):
-        robot.turn(vitesse)
-        time.sleep(dt)
-        t += dt
-    robot.stop_all()
 
 
 
@@ -109,37 +85,33 @@ Préconditions  -- robot    : la variable du robot
                   angle    : type entier ; l'angle voulu en degrés
 Postconditions -- déplace le robot
 -----------------------------------------------------------------------------------"""
-def bouger(robot, distance, angle):
+def avancer(robot, distance, angle, vitesse):
     #Constantes :
     dt = 0.1
-    vitesse = 100
     t = 0.0
 
     #Calculs :
     distance = distance*10
     temps = distance/vitesse
+    angle = angle - 45
 
     #Bouger :
-    tourner(robot, angle)
     time.sleep(dt)
     while(t < temps):
-        robot.move_toward(vitesse, 300)
+        robot.move_toward(vitesse, angle)
         time.sleep(dt)
         t += dt
-    robot.stop_all()
 
-holo = Holobot(sys.argv[1], 115200)
-initHolo(holo)
+
 
 """-----------------------------------------------------------------------------------------------
 Préconditions   -- robot     : la variable du robot
-                   inconnu   : doit toujours être 1
 
 
 Postconditions  -- renvoie la distance du robot a un obstacle
 -----------------------------------------------------------------------------------------------"""
-def dist(robot, inconnu):
-    distance = robot.get_dist(inconnu)
+def dist(robot):
+    distance = robot.get_dist()
     return distance
 
 
@@ -152,26 +124,78 @@ Préconditions   -- duree    : temps durant lequel le robot continue de frapper
 Postconditions  -- Ordonne au robot de frapper
 -----------------------------------------------------------------------------------------------"""
 
-# Set up obligatoire des pins GPIO
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(3, GPIO.OUT)
-GPIO.setup(3, GPIO.OUT, initial=GPIO.HIGH)
-
 def frapper(duree, cadence):
-	t = 0
-	while t < duree :
-		GPIO.output(3, not GPIO.input(3))
-		pause = 1/cadence
-		time.sleep(pause)
-		t += pause
+    t = 0
+    while t < duree :
+        GPIO.output(3, not GPIO.input(3))
+        pause = 1/cadence
+        time.sleep(pause)
+        t += pause
+
+"""--------------------------------------------------------------------------------------------
+Préconditions  -- robot     : la variable du robot
+
+Postconditions -- Renvoie une information sur le robot
+-----------------------------------------------------------------------------------------------"""
+def faux(robot):
+    robot.beep(150, 200)
+    robot.set_leds(255,0,0)
+    time.sleep(1)
+    robot.set_leds(0,0,0)
+
+def juste(robot):
+    robot.beep(880, 200)
+    robot.set_leds(0,255,0)
+    time.sleep(1)
+    robot.set_leds(0,0,0)
+
+"""--------------------------------------------------------------------------------------------
+Préconditions  -- vitesse     : la vitesse de rotation (toujours positive) en degrés par seconde
+                  angle       : l'angle en degré à atteindre
+
+Postconditions -- Ordonne au robot de pivoter de "angle" degrés
+-----------------------------------------------------------------------------------------------"""
+def tourner(vitesse, angleCible) :
+
+    holo.reset_yaw()
 
 
+    if (abs(angleCible) < 90) :
+        correction = 6
+    elif abs(angleCible) < 180 :
+        correction = 10
+    elif angleCible < 270 :
+        correction = 6
+    elif angleCible < 360 :
+        correction = 10
+    if angleCible == 180:
+        angleCible += 1
 
+    if angleCible < 0 :
+        angleCible += 360
+
+    angle = holo.get_yaw()
+
+    while(angle > (angleCible+correction) or angle < (angleCible-correction)) :
+        angle = holo.get_yaw()
+
+        if angle < 0 :
+            angle += 360
+
+
+        if angleCible < 180 :
+            holo.turn(vitesse)
+
+        elif angleCible > 180 :
+            holo.turn(-vitesse)
+
+
+    holo.stop_all()
 
 """--------------------------------- Début du code Principal --------------------------------- """
 
-greenLower = (5, 140, 185)
-greenUpper = (30, 215, 255)
+orangeLower = (5, 140, 185)
+orangeUpper = (30, 215, 255)
 
 
 camera = cv2.VideoCapture(0)
@@ -185,7 +209,7 @@ while True:
 
     frame = imutils.resize(frame, width=600)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(hsv, greenLower, greenUpper)
+    mask = cv2.inRange(hsv, orangeLower, orangeUpper)
     #mask = cv2.erode(mask, None, iterations=2)
     #mask = cv2.dilate(mask, None, iterations=2)
 
