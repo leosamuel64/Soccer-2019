@@ -229,7 +229,7 @@ while True:
             pos = (300-int(x))*-1    # position par rapport au centre de l'image x=300
             print("Pos = "+str(pos))
             BALLE = True
-
+            diametre = radius*2
         else:
             u=os.system('clear')
             print("PAS DE BALLE")
@@ -249,26 +249,15 @@ while True:
     #cv2.imshow("Mask", mask)
 
     if BALLE == True :
-        if (x < 250) and (x !=-1) :
-            #gauche
-            #tournerg(holo, 1)
-            holo.turn(5)
-            holo.move_toward(30, 300)
+        angle = calcAngle(x)
+        distance = calcDistance(diametre)
+        vitesse = 300
+        avancer(holo, distance, angle, vitesse)
 
-        elif (x > 350) :
-            #droite
-            #tournerd(holo,1)
-            holo.turn(-5)
-            holo.move_toward(30, 300)
+    else :
+        holo.stop_all()
+        tourner(vitesse, 80)
 
-        elif (x ==-1) :
-            holo.stop_all()
-        else :
-            holo.move_toward(30, 300)
-
-    else : holo.stop_all()
-        holo.turn(20)
-
-    key = cv2.waitKey(1) & 0xFF
+    #key = cv2.waitKey(1) & 0xFF
 camera.release()
 cv2.destroyAllWindows()
