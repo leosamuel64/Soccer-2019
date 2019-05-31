@@ -6,7 +6,7 @@ if (angleDecalage <= 0) :
     angleTir = ((180 - angleDecalage)/2)
 
 elif (angleDecalage >= 0) :
-    angleTir = ((180 + angleDecalage)/2)
+    angleTir = -((180 + angleDecalage)/2)
 
 #robot qui va se déplacer selon un cercle
 def cercle(angleTir) :
