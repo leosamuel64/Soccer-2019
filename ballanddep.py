@@ -251,7 +251,7 @@ while True:
     if BALLE == True :
         angle = calcAngle(x)
         distance = calcDistance(diametre)
-        vitesse = 300
+        vitesse = 30
         avancer(holo, distance, angle, vitesse)
 
     else :
