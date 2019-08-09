@@ -9,9 +9,10 @@ import cv2
 import os
 import RPi.GPIO as GPIO
 
-#TODO : retourner quel(s) capteur(s) detecte(nt) opts
-#TODO : optimiser le deplacement 
-#TODO  : definir les limites pour les couleurs buts
+#TODO : Retourner quel(s) capteur(s) detecte(nt) opts
+#TODO : Optimiser le deplacement 
+#TODO : Refinir les limites pour les couleurs buts
+#TODO : Faire la fonction pour la detection de la balle avec le miroir
 
 """----------------------------------------------------------------------------------- 
 Postconditions -- initialise les systemes du robot et le robot
