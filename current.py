@@ -14,6 +14,7 @@ import RPi.GPIO as GPIO
 #TODO : Refinir les limites pour les couleurs buts
 #TODO : Faire la fonction pour la detection de la balle avec le miroir
 
+
 """----------------------------------------------------------------------------------- 
 Postconditions -- initialise les systemes du robot et le robot
 -----------------------------------------------------------------------------------"""
