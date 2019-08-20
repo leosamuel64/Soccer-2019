@@ -1,3 +1,10 @@
+
+#TODO : Retourner quel(s) capteur(s) detecte(nt) opts
+#TODO : Optimiser le deplacement 
+#TODO : Refinir les limites pour les couleurs buts
+#TODO : Faire la fonction pour la detection de la balle avec le miroir
+#TODO : Ajouter les temperatures GPU et CPU dans le Debug
+
 import math
 import time
 import sys
@@ -8,11 +15,6 @@ import imutils
 import cv2
 import os
 import RPi.GPIO as GPIO
-
-#TODO : Retourner quel(s) capteur(s) detecte(nt) opts
-#TODO : Optimiser le deplacement 
-#TODO : Refinir les limites pour les couleurs buts
-#TODO : Faire la fonction pour la detection de la balle avec le miroir
 
 
 """----------------------------------------------------------------------------------- 
@@ -36,7 +38,7 @@ def init():
     u=os.system('clear')
 
 """-----------------------------------------------------------------------------------
-Préconditions  -- distancemin : distance entre le capteur IR et la balle pour frapper 
+Préconditions  -- dimimage : Taille de la capture depuis la camera 
                     
 Postconditions -- Active de mode de debug
 -----------------------------------------------------------------------------------"""
